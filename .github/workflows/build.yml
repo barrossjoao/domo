@@ -1,0 +1,35 @@
+name: Build macOS
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - name: Obter código
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Compilar aplicativo
+        run: make build
+      - name: Verificar pacote nativo
+        run: make verify
+      - name: Empacotar aplicativo
+        run: |
+          version=$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' Resources/Info.plist)
+          arch=$(uname -m)
+          ditto -c -k --sequesterRsrc --keepParent dist/Domo.app "dist/Domo-${version}-mac-${arch}.zip"
+      - name: Disponibilizar pacote de desenvolvimento
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: Domo-mac-${{ runner.arch }}
+          path: dist/Domo-*.zip
+          if-no-files-found: error
+          retention-days: 14

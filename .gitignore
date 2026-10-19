@@ -1,0 +1,17 @@
+.build/
+.swiftpm/
+dist/
+.DS_Store
+__pycache__/
+*.pyc
+*.xcuserstate
+xcuserdata/
+.env
+.env.*
+*.zip
+*.dmg
+*.dSYM/
+*.p12
+*.p8
+*.pem
+*.key

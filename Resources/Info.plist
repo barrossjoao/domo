@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>Domo</string>
+	<key>CFBundleExecutable</key>
+	<string>Domo</string>
+	<key>CFBundleIdentifier</key>
+	<string>br.automatizehouse.mac</string>
+	<key>CFBundleName</key>
+	<string>Domo</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.2.8</string>
+	<key>CFBundleVersion</key>
+	<string>13</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>13.0</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>Protocolo Positivo adaptado de unofficial-positivo-pcuirn (MIT). Consulte Resources/Licenses.</string>
+</dict>
+</plist>

@@ -1,6 +1,6 @@
 # Arquitetura
 
-O Domo é um aplicativo macOS de um único processo. A interface, o estado dos controles e a comunicação HTTPS são implementados em Swift. Não existe serviço local em segundo plano.
+O Domo é um aplicativo macOS nativo. A interface, o estado dos controles e a comunicação HTTPS são implementados em Swift. Não existe servidor local; o Sparkle inclui auxiliares nativos usados durante atualizações.
 
 ## Organização
 
@@ -20,7 +20,7 @@ Essas pastas representam responsabilidades dentro de um módulo. Elas não são 
 
 `MenuBarAppDelegate` cria o ícone, o popover e a janela opcional. Ambos recebem a mesma instância de `HouseStore`. Fechar uma tela não destrói a sessão. Sair da aplicação encerra o processo, mas o acesso continua no Chaves para a próxima abertura. O delegate chama `HouseStore.restoreLogin` uma vez ao iniciar; abrir o popover ou a janela não dispara logins duplicados.
 
-Uma segunda abertura do app revela o painel da instância existente, em vez de criar outra instância de controle.
+Uma segunda abertura encerra a nova instância sem revelar o painel existente.
 
 ## Estado e apresentação
 
@@ -116,9 +116,9 @@ O protocolo não oficial pode mudar. Falhas de rede e de autenticação são mos
 
 ## Compilação e pacote
 
-`Package.swift` declara o executável e o target XCTest, sem dependências externas. O Swift Package Manager descobre os arquivos em `Sources` e `Tests`, eliminando listas manuais de fontes no empacotador.
+`Package.swift` declara o executável, o target XCTest e o framework binário Sparkle 2.10.0. O manifesto e `Package.resolved` fixam a versão; o SwiftPM valida o checksum do artefato oficial. O Swift Package Manager descobre os arquivos em `Sources` e `Tests`, eliminando listas manuais de fontes no empacotador.
 
-`scripts/build_app.py` compila em release, copia o binário, os metadados de `Resources/Info.plist` e as licenças para um pacote temporário. A assinatura local é verificada antes da substituição do aplicativo existente. Uma falha ao substituir o pacote restaura a versão anterior.
+`scripts/build_app.py` compila em release, copia o binário, os metadados de `Resources/Info.plist`, as licenças e o Sparkle para um pacote temporário, preservando seus links simbólicos e assinaturas originais. `--universal` inclui arm64 e x86_64; o rpath do executável aponta para `Contents/Frameworks`. A assinatura local é verificada antes da substituição do aplicativo existente. Uma falha ao substituir o pacote restaura a versão anterior.
 
 `scripts/verify_app.py` faz inspeção estática de metadados, assinatura, bibliotecas vinculadas e arquivos embarcados. Ele não executa o aplicativo nem acessa a nuvem. As saídas geradas ficam em `dist`; o cache do SwiftPM fica em `.build`. Ambos são ignorados pelo Git.
 
@@ -165,3 +165,13 @@ O popover só abre por ações no ícone da barra de menus. Inicialização e de
 ## Nome e compatibilidade
 
 O nome de produto, módulo Swift, executável e pacote é `Domo`; o projeto fica em `~/Documents/domo`. O identificador de bundle `br.automatizehouse.mac` e o serviço do Chaves `br.automatizehouse.mac.positivo.login` permanecem estáveis para preservar a identidade do aplicativo, o acesso salvo e as preferências existentes. Esses identificadores internos não são nomes de apresentação. Nenhum login é copiado para arquivos ou para o repositório.
+
+## Atualizações
+
+`AppUpdater` mantém um `SPUStandardUpdaterController` vivo no delegate e publica `canCheckForUpdates` para o menu SwiftUI. O controlador só inicia após a verificação de instância única; abrir o painel não reinicia o agendamento. Os menus AppKit também validam a disponibilidade da ação. Uma consulta manual ativa a interface nativa do Sparkle, sem reabrir o painel dos controles.
+
+`Info.plist` define o feed HTTPS de `releases/latest/download/appcast.xml`, a chave pública e os padrões de consulta a cada hora e instalação automática. O Sparkle gerencia preferências, agendamento, download, instalação ao encerrar e oferta de reinicialização quando necessário. As notas web e o perfil de sistema ficam desativados. Feed e arquivo precisam de assinatura EdDSA; o download é verificado antes da extração. Erros preservam o aplicativo instalado.
+
+`scripts/prepare_release.py` exige uma tag correspondente ao projeto e um binário universal, chama a inspeção do pacote e gera ZIP e feed numa pasta temporária. `generate_appcast` assina ambos; as assinaturas e os metadados são conferidos antes de copiá-los para `dist/release`. Uma chave divergente da pública embarcada impede gerar uma enclosure assinada e bloqueia a publicação. Os testes Python cobrem rejeição de tag divergente, versão, URL, tamanho e assinatura ausente.
+
+O workflow `release.yml` roda somente para tags no repositório de origem. A chave privada entra apenas na etapa de assinatura, pelo secret `SPARKLE_PRIVATE_KEY`; o script a passa pela entrada padrão às ferramentas oficiais e a remove do ambiente herdado pelos subprocessos. Sem o secret, o CI falha antes de publicar. Localmente, o script usa o Chaves, conta `domo-releases`. O `.app` e a chave pública são públicos; a chave privada e os dados de login não fazem parte dos artefatos.

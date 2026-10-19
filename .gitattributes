@@ -1,2 +1,5 @@
 * text=auto eol=lf
 *.png binary
+
+# Preserve third-party license text exactly as distributed.
+Licenses/Sparkle.txt -whitespace

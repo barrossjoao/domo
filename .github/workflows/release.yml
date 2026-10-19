@@ -1,0 +1,44 @@
+name: Publish macOS release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.repository == 'barrossjoao/domo'
+    runs-on: macos-15
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ github.ref_name }}
+    steps:
+      - name: Obter código da tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Conferir versão
+        run: python3 scripts/prepare_release.py --tag "$RELEASE_TAG" --check-version
+      - name: Verificar scripts de publicação
+        run: python3 -m unittest discover -s scripts/tests
+      - name: Compilar para Apple silicon e Intel
+        run: python3 scripts/build_app.py --universal
+      - name: Assinar e verificar pacote e feed
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: python3 scripts/prepare_release.py --tag "$RELEASE_TAG"
+      - name: Publicar versão completa
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$RELEASE_TAG"
+          dist/release/Domo-*-mac-universal.zip dist/release/appcast.xml
+          --verify-tag --generate-notes --latest

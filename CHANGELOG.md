@@ -1,5 +1,16 @@
 # Changelog
 
+
+## 2.2.9
+
+- Atualizador nativo Sparkle, com consulta automática ao GitHub a cada hora, download verificado e instalação ao encerrar o aplicativo.
+- Ação Buscar atualizações no painel, menu principal e clique direito do ícone, respeitando o estado do atualizador.
+- Feed e pacotes assinados com EdDSA, verificação antes da extração, sem notas web nem perfil de sistema.
+- Releases universais para Apple silicon e Intel publicadas pelo GitHub Actions ao enviar uma tag correspondente à versão.
+- Validações de empacotamento, assinaturas e metadados de release; licença do Sparkle incluída no aplicativo.
+
+A 2.2.8 e anteriores precisam ser substituídas uma vez para receber o atualizador. A assinatura Developer ID e a notarização Apple continuam separadas.
+
 ## 2.2.8
 
 - O aplicativo passa a se chamar Domo, incluindo módulo Swift, executável, pasta do projeto, documentação e pacotes.

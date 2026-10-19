@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Compile the Swift package and stage a signed macOS application."""
 from pathlib import Path
+import argparse
 import plistlib
 import shutil
 import subprocess
@@ -12,13 +13,19 @@ APP = DIST / "Domo.app"
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--universal", action="store_true", help="Compilar para Apple silicon e Intel")
+    args = parser.parse_args()
+    build = ["swift", "build", "--configuration", "release"]
+    if args.universal:
+        build += ["--arch", "arm64", "--arch", "x86_64"]
     subprocess.run(
-        ["swift", "build", "--configuration", "release", "--product", "Domo"],
+        build + ["--product", "Domo"],
         cwd=ROOT,
         check=True,
     )
     binary_directory = subprocess.check_output(
-        ["swift", "build", "--configuration", "release", "--show-bin-path"],
+        build + ["--show-bin-path"],
         cwd=ROOT,
         text=True,
     ).strip()
@@ -40,6 +47,8 @@ def main():
         shutil.copy2(Path(binary_directory) / "Domo", executable)
         shutil.copy2(ROOT / "Resources/Info.plist", staged / "Contents/Info.plist")
         shutil.copytree(ROOT / "Licenses", resources / "Licenses")
+        framework = ROOT / ".build/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework"
+        shutil.copytree(framework, staged / "Contents/Frameworks/Sparkle.framework", symlinks=True)
         subprocess.run(["codesign", "--force", "--sign", "-", str(staged)], check=True)
         subprocess.run(["codesign", "--verify", "--deep", "--strict", str(staged)], check=True)
 

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DashboardView: View {
   @ObservedObject var store: HouseStore
+  @ObservedObject var updater: AppUpdater
   let openWindow: () -> Void
   let quit: () -> Void
   @State private var showStatus = false
@@ -29,6 +30,8 @@ struct DashboardView: View {
               "Versão \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—")"
             )
             Divider()
+            Button("Buscar atualizações…") { updater.checkForUpdates() }
+              .disabled(!updater.canCheckForUpdates)
             Button("Abrir em janela", action: openWindow)
             Divider()
             Button("Sair do Domo", action: quit).keyboardShortcut("q")

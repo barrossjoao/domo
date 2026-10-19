@@ -13,9 +13,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.2.8</string>
+	<string>2.2.9</string>
 	<key>CFBundleVersion</key>
-	<string>13</string>
+	<string>14</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>13.0</string>
 	<key>LSUIElement</key>
@@ -24,5 +24,25 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>Protocolo Positivo adaptado de unofficial-positivo-pcuirn (MIT). Consulte Resources/Licenses.</string>
+	<key>SUFeedURL</key>
+	<string>https://github.com/barrossjoao/domo/releases/latest/download/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>G2oW8OghpQySw0r0fM8pnPxWRUsuCphNJsWTabjqQaU=</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUAutomaticallyUpdate</key>
+	<true/>
+	<key>SUScheduledCheckInterval</key>
+	<integer>3600</integer>
+	<key>SUScheduledImpatientCheckInterval</key>
+	<integer>86400</integer>
+	<key>SUVerifyUpdateBeforeExtraction</key>
+	<true/>
+	<key>SURequireSignedFeed</key>
+	<true/>
+	<key>SUEnableSystemProfiling</key>
+	<false/>
+	<key>SUShowReleaseNotes</key>
+	<false/>
 </dict>
 </plist>

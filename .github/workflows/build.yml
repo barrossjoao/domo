@@ -2,6 +2,7 @@ name: Build macOS
 
 on:
   push:
+    branches: ['**']
   pull_request:
   workflow_dispatch:
 
@@ -17,6 +18,8 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Verificar scripts de publicação
+        run: python3 -m unittest discover -s scripts/tests
       - name: Compilar aplicativo
         run: make build
       - name: Verificar pacote nativo

@@ -24,3 +24,5 @@ Os testes XCTest existentes podem ser executados localmente com `swift test` qua
 Cada entrega incrementa o último número de `CFBundleShortVersionString` e também `CFBundleVersion`, em `Resources/Info.plist`. Atualize a versão no README e o nome do ZIP. Recompilações da mesma entrega mantêm a versão.
 
 Consulte [Publicar no GitHub](docs/PUBLISHING.md) para o primeiro envio e as releases. Tokens, certificados e chaves privadas não pertencem ao repositório. A atribuição e a licença do protocolo adaptado ficam em `Licenses`.
+
+Para publicar uma atualização instalável, siga [PUBLISHING.md](docs/PUBLISHING.md). O Sparkle é fixado em `Package.swift` e `Package.resolved`; uma mudança nessa dependência exige verificar o framework embarcado e seu licenciamento. Não altere a chave pública nem a identidade do bundle sem planejar compatibilidade.

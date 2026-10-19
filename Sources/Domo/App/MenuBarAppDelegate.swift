@@ -4,6 +4,7 @@ import SwiftUI
 @MainActor
 final class MenuBarAppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
   private let store = HouseStore()
+  private let updater = AppUpdater()
   private var statusItem: NSStatusItem!
   private let popover = NSPopover()
   private var window: NSWindow?
@@ -20,6 +21,7 @@ final class MenuBarAppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
       return
     }
     configureMainMenu()
+    updater.start()
     statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
     if let button = statusItem.button {
       let image = NSImage(systemSymbolName: "house", accessibilityDescription: "Domo")
@@ -57,6 +59,8 @@ final class MenuBarAppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
     let menu = NSMenu()
     let application = NSMenuItem(title: "Domo", action: nil, keyEquivalent: "")
     application.submenu = NSMenu(title: "Domo")
+    application.submenu?.addItem(updateMenuItem())
+    application.submenu?.addItem(.separator())
     application.submenu?.addItem(
       withTitle: "Sair do Domo", action: #selector(NSApplication.terminate(_:)),
       keyEquivalent: "q")
@@ -78,7 +82,7 @@ final class MenuBarAppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
 
   private func content() -> DashboardView {
     DashboardView(
-      store: store, openWindow: { [weak self] in self?.openWindow() },
+      store: store, updater: updater, openWindow: { [weak self] in self?.openWindow() },
       quit: { NSApp.terminate(nil) })
   }
   @objc private func togglePopover(_ sender: Any?) {
@@ -92,12 +96,20 @@ final class MenuBarAppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelega
       menu.addItem(
         NSMenuItem(title: "Sair do Domo", action: #selector(quit), keyEquivalent: "q"))
       for item in menu.items { item.target = self }
+      menu.insertItem(updateMenuItem(), at: 2)
       menu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.bounds.minY), in: button)
     } else if popover.isShown {
       popover.performClose(sender)
     } else {
       revealPopover()
     }
+  }
+  private func updateMenuItem() -> NSMenuItem {
+    let item = NSMenuItem(
+      title: "Buscar atualizações…", action: #selector(AppUpdater.checkForUpdates(_:)),
+      keyEquivalent: "")
+    item.target = updater
+    return item
   }
   @objc private func revealPopover() {
     guard let button = statusItem?.button else { return }
